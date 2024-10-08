@@ -16,8 +16,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format-sql: true
     show-sql: true
+  rabbitmq:
+    addresses: localhost:5672
 
-
+#define the eureka configuration
 eureka:
   client:
     serviceUrl:
@@ -25,7 +27,17 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
 
+# define the zipkin configuration
 management:
   tracing:
     sampling:
       probability: 1.0
+
+# define the rabbitmq configuration
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queue:
+    notification: notification.queue
+  routing-keys:
+    internal-notification: internal.notification.routing-key

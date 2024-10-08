@@ -9,8 +9,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="notification" />
         <module name="apigw" />
-        <module name="Fraud" />
         <module name="clients" />
+        <module name="amqp" />
+        <module name="Fraud" />
         <module name="eureka-server" />
         <module name="customer" />
       </profile>

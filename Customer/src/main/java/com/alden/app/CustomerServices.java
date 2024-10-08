@@ -1,5 +1,6 @@
 package com.alden.app;
 
+import com.alden.amqp.RabbitMQMessageProducer;
 import com.alden.clients.fraud.FraudCheckResponse;
 import com.alden.clients.fraud.FraudClient;
 import com.alden.clients.notification.NotificationClient;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 public record CustomerServices(CustomerRepository customerRepository,
                                CustomerConfig customerConfig,
                                FraudClient fraudClient,
-                               NotificationClient notificationClient) {
+                               NotificationClient notificationClient,
+                               RabbitMQMessageProducer rabbitMQMessageProducer
+                               ) {
 
     public void registerNewCustomer(CustomerRegisterRequest request) {
         Customer customer = Customer.builder().firstName(request.firstName()).lastName(
@@ -25,9 +28,18 @@ public record CustomerServices(CustomerRepository customerRepository,
             throw new IllegalStateException("Customer is a fraudster");
         }
 
-        notificationClient.sendNotification(new NotificationRequest(customer.getId(),
+//        notificationClient.sendNotification(new NotificationRequest(customer.getId(),
+//                customer.getEmail(),
+//                String.format("Hi %s, welcome to Alden Bank",
+//                        customer.getFirstName())));
+
+        NotificationRequest notificationRequest = new NotificationRequest(customer.getId(),
                 customer.getEmail(),
                 String.format("Hi %s, welcome to Alden Bank",
-                        customer.getFirstName())));
+                        customer.getFirstName()));
+
+        rabbitMQMessageProducer.publish(notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing-key");
     }
 }
